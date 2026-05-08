@@ -99,3 +99,57 @@ RETURN
 Status IND[XX] (SLA) = 
 IF([COLUNA_TEMPO] <= [PRAZO_SLA_SEGUNDOS], "NÃO VIOLADO", "VIOLADO")
 ```
+
+## 5. Formatação via DAX Formatter API
+
+Antes de criar qualquer medida no Power BI, formate o código usando a API pública do daxformatter.com.
+
+### Endpoint
+```
+POST https://www.daxformatter.com/api/daxformatter/DaxFormat
+```
+
+### Headers
+```
+Content-Type: application/json; charset=UTF-8
+```
+
+### Payload
+```json
+{
+  "Dax": "<código DAX aqui>",
+  "ListSeparator": ",",
+  "DecimalSeparator": "."
+}
+```
+
+**Parâmetros:**
+- `Dax` (string): O código DAX a ser formatado
+- `ListSeparator` (char): Use `","` para padrão BR/US
+- `DecimalSeparator` (char): Use `"."` para padrão US ou `","` para padrão BR
+
+### Resposta
+String JSON com o código DAX formatado, por exemplo:
+```
+"DIVIDE (\n    [Chamados com Início ≤30min],\n    [Total de Chamados IND02],\n    0\n) * 100\n"
+```
+
+### Exemplo completo (cURL)
+```bash
+curl -X POST https://www.daxformatter.com/api/daxformatter/DaxFormat \
+  -H "Content-Type: application/json" \
+  -d '{"Dax":"DIVIDE([Chamados com Início ≤30min],[Total de Chamados IND02],0)*100","ListSeparator":",","DecimalSeparator":"."}'
+```
+
+### Fluxo para o Agente
+1. Componha o DAX bruto a partir dos templates desta seção ou baseado na regra do indicador
+2. Faça POST para o endpoint acima com o DAX no payload
+3. Extraia o valor retornado (remova as aspas externas da string JSON)
+4. Use esse código formatado ao criar a medida no Power BI via MCP
+5. **Fallback:** Se a API retornar erro (timeout, status != 200), use o código bruto sem formatação e avise o usuário
+
+### Notas de Implementação
+- A API é gratuita e não requer autenticação
+- Tempo de resposta típico: <1 segundo por medida
+- Ideal para DAX complexo (SWITCH com múltiplas faixas, FILTER aninhados)
+- A formatação melhora significativamente a legibilidade do código no Power BI Desktop

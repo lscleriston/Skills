@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit -m 'docs: adiciona padrão de 3 níveis para criação de medidas de indicadores *)"
+      "Bash(git commit -m 'docs: adiciona padrão de 3 níveis para criação de medidas de indicadores *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.daxformatter.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh repo *)",
+      "WebSearch",
+      "WebFetch(domain:daxstudio.org)",
+      "WebFetch(domain:fabric.guru)"
     ]
   }
 }

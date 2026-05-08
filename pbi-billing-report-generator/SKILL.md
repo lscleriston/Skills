@@ -48,6 +48,12 @@ Chamados com Início ≤30min = CALCULATE(COUNTROWS(FILTER(tb_chamados_ca, tb_ch
 IND02 - Tempo Início Atendimento % = DIVIDE([Chamados com Início ≤30min], [Total de Chamados IND02], 0) * 100
 ```
 
+#### Formatação Obrigatória Antes de Criar Cada Medida
+Antes de registrar qualquer medida DAX no Power BI via MCP:
+1. Componha o código DAX conforme os templates em [references/dax-templates.md](references/dax-templates.md)
+2. Formate o código chamando a API do DAX Formatter (ver [references/dax-templates.md](references/dax-templates.md), Seção 5)
+3. Use o código formatado retornado pela API ao criar a medida via MCP
+
 - **Medidas de Glosa:** Para cada indicador, crie a medida `Glosa INDXX` usando a lógica de `SWITCH(TRUE())` baseada nas faixas de ajuste do JSON.
 - **Totais:** Crie as medidas `Total de Glosas` e `Faturamento Líquido`.
 
@@ -62,4 +68,5 @@ IND02 - Tempo Início Atendimento % = DIVIDE([Chamados com Início ≤30min], [T
 ## Diretrizes de Implementação
 - **Nomenclatura:** Siga o padrão `IND[XX] - [Nome] %`.
 - **Display Folders:** Organize as medidas em pastas (`FINANCEIRO`, `IND01`, `IND02`, etc.).
+- **Formatação DAX:** Todo código DAX deve ser formatado via daxformatter.com antes de ser aplicado. Nunca crie medidas com código não formatado.
 - **CSS:** Não altere a estrutura de grid (5 colunas para o topo, 3 colunas para os indicadores).
