@@ -9,7 +9,8 @@
       "Bash(gh repo *)",
       "WebSearch",
       "WebFetch(domain:daxstudio.org)",
-      "WebFetch(domain:fabric.guru)"
+      "WebFetch(domain:fabric.guru)",
+      "Bash(git commit -m 'docs: adiciona orientação para criar páginas de indicadores com visual HTML *)"
     ]
   }
 }

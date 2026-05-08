@@ -76,8 +76,32 @@ Cada medida `Detalhe Indicador X HTML` deve:
 4. Formatar valores numéricos com `FORMAT()` conforme exemplos
 5. Antes de aplicar no Power BI, passar o código DAX pelo formatador (ver Seção 5 de dax-templates.md)
 
+### 6. Páginas de Indicadores (Relatório Visual)
+Para cada indicador (IND01 a IND05):
+1. **Crie uma página** no relatório Power BI nomeada `IND[XX] - [Nome]`
+2. **Insira um visual HTML** contendo a medida `Detalhe Indicador X HTML`, seguindo o modelo TMDL em [references/tmdl-templates.md](references/tmdl-templates.md), Seção 1
+3. **Não customize as propriedades do visual:**
+   - Posição e tamanho: use as dimensões padrão (1104px × 336px)
+   - Tipo de visual: sempre `htmlContent` (tipo Microsoft HTML)
+   - Projeção: sempre a medida `Detalhe Indicador X HTML`
+   - Drill filter: deve estar ativado (`drillFilterOtherVisuals: true`)
+4. **Valide no Power BI Desktop** que o layout do HTML renderiza corretamente (cores, espaçamento, responsive)
+
 ## Diretrizes de Implementação
-- **Nomenclatura:** Siga o padrão `IND[XX] - [Nome] %`.
+- **Nomenclatura:** Siga o padrão `IND[XX] - [Nome] %` para medidas de percentual.
 - **Display Folders:** Organize as medidas em pastas (`FINANCEIRO`, `IND01`, `IND02`, etc.).
 - **Formatação DAX:** Todo código DAX deve ser formatado via daxformatter.com antes de ser aplicado. Nunca crie medidas com código não formatado.
-- **CSS:** Não altere a estrutura de grid (5 colunas para o topo, 3 colunas para os indicadores).
+- **Páginas de Indicadores:** Nome das páginas: `IND[XX] - [Nome Indicador]` (ex: `IND02 - Tempo Início Atendimento`).
+- **Visual HTML:** Use sempre o tipo `htmlContent` (Microsoft HTML). Posicionamento padrão: 1104px × 336px. Não customize properties.
+- **CSS:** Não altere a estrutura de grid (3 colunas no cabeçalho, 3 colunas no rodapé). Cores e espaçamento são fixos.
+
+## Sequência Recomendada de Implementação (Agente)
+
+1. **Leia o JSON de indicadores** (metas, glosas, descrições)
+2. **Crie as medidas de 3 níveis** por indicador (Total → Critério → %) → **Formate via DAX Formatter**
+3. **Crie as medidas de Glosa** (SWITCH com faixas) → **Formate via DAX Formatter**
+4. **Componha o HTML** para `Detalhe Indicador X HTML` (seguindo template Seção 6 de dax-templates.md) → **Formate via DAX Formatter**
+5. **Crie páginas** no relatório: uma página por indicador nomeada `IND[XX] - [Nome]`
+6. **Insira visual HTML** em cada página usando template TMDL em [references/tmdl-templates.md](references/tmdl-templates.md)
+7. **Valide no Power BI Desktop:** layout, cores, responsividade, interatividade de filtros
+8. **Dashboard Consolidado:** Crie medida `Dashboard HTML` agregando todos os 5 indicadores
