@@ -20,7 +20,34 @@ Este skill automatiza a implementação completa de um sistema de faturamento ba
 - Configure relacionamentos: Data de Abertura (Ativo), outras datas (Inativos).
 
 ### 3. Medidas de Desempenho e Financeiras
-- **Medidas Base:** Crie as medidas de contagem e percentual para cada indicador listado no JSON.
+
+#### Padrão de Criação de Medidas por Indicador (3 Níveis Hierárquicos)
+Para cada indicador (IND01, IND02, etc.), siga **obrigatoriamente** este padrão de 3 níveis:
+
+**Nível 1 - Total:**
+- Nome: `Total de [Métrica]` (ex: `Total de Chamados IND02`)
+- Função: `CALCULATE(COUNTA(tabela[id]))` ou `CALCULATE(COUNTROWS(tabela))`
+- Propósito: Contar o universo total da métrica, sem filtros
+
+**Nível 2 - Critério:**
+- Nome: `[Métrica] com [Condição]` (ex: `Chamados com Início ≤30min`)
+- Função: `CALCULATE(COUNTROWS(FILTER(tabela, condição)))`
+- Propósito: Contar apenas os registros que atendem ao SLA/critério específico
+
+**Nível 3 - Percentual:**
+- Nome: `IND[XX] - [Nome Indicador] %`
+- Função: `DIVIDE([Métrica com Critério], [Total de Métrica], 0) * 100`
+- Propósito: Calcular o percentual de conformidade referenciando as medidas anteriores
+
+**Exemplo Completo:**
+```
+Total de Chamados IND02 = CALCULATE(COUNTA(tb_chamados_ca[id]))
+
+Chamados com Início ≤30min = CALCULATE(COUNTROWS(FILTER(tb_chamados_ca, tb_chamados_ca[Tempo ate EM ATENDIMENTO] <= 30)))
+
+IND02 - Tempo Início Atendimento % = DIVIDE([Chamados com Início ≤30min], [Total de Chamados IND02], 0) * 100
+```
+
 - **Medidas de Glosa:** Para cada indicador, crie a medida `Glosa INDXX` usando a lógica de `SWITCH(TRUE())` baseada nas faixas de ajuste do JSON.
 - **Totais:** Crie as medidas `Total de Glosas` e `Faturamento Líquido`.
 

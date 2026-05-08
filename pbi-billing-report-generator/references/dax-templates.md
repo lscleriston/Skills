@@ -33,7 +33,54 @@ CALENDAR(vDataInicial, vDataFinal),
 )
 ```
 
-## 2. Medidas de Glosa (Padrão)
+## 2. Padrão de 3 Níveis para Indicadores (Total → Critério → %)
+
+### Nível 1: Total da Métrica
+```dax
+Total de [Métrica] = 
+CALCULATE(
+    COUNTA(tb_fatos[id]),
+    ALL(dCalendario)
+)
+```
+**Variações:**
+- Use `COUNTA()` para contar valores não-em-branco
+- Use `COUNTROWS()` para contar linhas (melhor para tabelas filtradas)
+- Omita `ALL()` se quiser respeitar filtros do contexto
+
+### Nível 2: Filtragem por Critério
+```dax
+[Métrica] com [Condição] = 
+CALCULATE(
+    COUNTROWS(
+        FILTER(
+            tb_fatos,
+            tb_fatos[Coluna de Tempo] <= [PRAZO_SLA_SEGUNDOS]
+        )
+    )
+)
+```
+**Variações:**
+- `tb_fatos[coluna] <= valor` (menor ou igual)
+- `tb_fatos[coluna] > valor` (maior que)
+- `tb_fatos[status] = "APROVADO"` (igualdade)
+- Combine múltiplas condições com `&&` (AND) ou `||` (OR)
+
+### Nível 3: Percentual
+```dax
+IND[XX] - [Nome do Indicador] % = 
+DIVIDE(
+    [Métrica com Critério],
+    [Total de Métrica],
+    0
+) * 100
+```
+**Notas:**
+- O terceiro parâmetro `0` define valor padrão se divisor for zero
+- Multiplique por `100` para exibir como percentual
+- Se quiser exibir com 2 casas decimais, use formato de célula ou `ROUND(..., 2)`
+
+## 3. Medidas de Glosa (Padrão)
 ```dax
 Glosa IND[XX] = 
 VAR _os = [Valor da ordem de serviço]
@@ -47,7 +94,7 @@ RETURN
     )
 ```
 
-## 3. Colunas de Status SLA
+## 4. Colunas de Status SLA
 ```dax
 Status IND[XX] (SLA) = 
 IF([COLUNA_TEMPO] <= [PRAZO_SLA_SEGUNDOS], "NÃO VIOLADO", "VIOLADO")
