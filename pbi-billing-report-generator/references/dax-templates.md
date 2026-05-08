@@ -153,3 +153,93 @@ curl -X POST https://www.daxformatter.com/api/daxformatter/DaxFormat \
 - Tempo de resposta típico: <1 segundo por medida
 - Ideal para DAX complexo (SWITCH com múltiplas faixas, FILTER aninhados)
 - A formatação melhora significativamente a legibilidade do código no Power BI Desktop
+
+## 6. Template: Detalhe Indicador X HTML
+
+**Nomenclatura:** `Detalhe Indicador [XX] HTML`
+
+**Estrutura obrigatória (3 seções + cores dinâmicas):**
+
+```dax
+Detalhe Indicador [XX] HTML = 
+VAR _val = [IND[XX] - [Nome Indicador] %]
+VAR _total = [Total de [Métrica Base]]
+VAR _atingido = [[Métrica] com [Critério SLA]]
+VAR _glosaPerc = DIVIDE([Glosa IND[XX]], [Valor da ordem de serviço], 0)
+VAR _badgeBg = IF(_glosaPerc = 0, "#E1F5EE", "#FCEBEB")
+VAR _badgeText = IF(_glosaPerc = 0, "#085041", "#791F1F")
+
+VAR _glosas = 
+"<div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'>
+  <div style='font-size:10px;color:#5F5E5A;text-transform:uppercase;margin-bottom:6px'>Faixas de glosa</div>
+  <div style='display:flex;flex-direction:column;gap:3px'>
+    <div style='display:flex;justify-content:space-between;align-items:center;font-size:11px'><span style='color:#3a4440'>[FAIXA_1]</span><span style='background:[COR_1];color:[TEXT_1];padding:1px 7px;border-radius:999px;font-size:10px;font-weight:500'>[GLOSA_1]</span></div>
+    <div style='display:flex;justify-content:space-between;align-items:center;font-size:11px'><span style='color:#3a4440'>[FAIXA_2]</span><span style='background:[COR_2];color:[TEXT_2];padding:1px 7px;border-radius:999px;font-size:10px;font-weight:500'>[GLOSA_2]</span></div>
+    <div style='display:flex;justify-content:space-between;align-items:center;font-size:11px'><span style='color:#3a4440'>[FAIXA_3]</span><span style='background:[COR_3];color:[TEXT_3];padding:1px 7px;border-radius:999px;font-size:10px;font-weight:500'>[GLOSA_3]</span></div>
+    <div style='display:flex;justify-content:space-between;align-items:center;font-size:11px'><span style='color:#3a4440'>[FAIXA_4]</span><span style='background:[COR_4];color:[TEXT_4];padding:1px 7px;border-radius:999px;font-size:10px;font-weight:500'>[GLOSA_4]</span></div>
+  </div>
+</div>"
+
+RETURN
+"<div style='font-family:Segoe UI,sans-serif;font-size:13px;line-height:1.5;max-width:100%;padding:0'>
+  <div style='background:#fff;border:0.5px solid #d3d1c7;border-radius:12px;padding:16px 20px'>
+    <div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px'>
+      <div>
+        <div style='font-size:10px;color:#888780;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px'>Indicador de serviço</div>
+        <div style='font-size:15px;font-weight:500;color:#1b2320'>[NOME_COMPLETO_INDICADOR]</div>
+      </div>
+      <span style='background:" & _badgeBg & ";color:" & _badgeText & ";padding:3px 12px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap;margin-left:12px'>Glosa: " & FORMAT(_glosaPerc, "0%") & "</span>
+    </div>
+    <div style='display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px'>
+      <div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'>
+        <div style='font-size:10px;color:#5F5E5A;text-transform:uppercase;margin-bottom:4px'>Finalidade</div>
+        <div style='font-size:12px;color:#3a4440'>[DESCRIÇÃO_FINALIDADE_DO_INDICADOR]</div>
+      </div>
+      <div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'>
+        <div style='font-size:10px;color:#5F5E5A;text-transform:uppercase;margin-bottom:4px'>Mecanismo de cálculo</div>
+        <div style='font-size:11px;color:#3a4440;font-family:Consolas,monospace'>[FÓRMULA_RESUMIDA]</div>
+      </div>
+      " & _glosas & "
+    </div>
+    <div style='border-top:0.5px solid #e4e7e5;padding-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px'>
+      <div style='background:#f8f9f8;border-radius:8px;padding:10px 12px;text-align:center'>
+        <div style='font-size:22px;font-weight:500;color:#1b2320'>" & FORMAT(_total, "#,##0") & "</div>
+        <div style='font-size:10px;color:#888780;margin-top:2px;text-transform:uppercase'>Total de [MÉTRICA] no período</div>
+      </div>
+      <div style='background:#f8f9f8;border-radius:8px;padding:10px 12px;text-align:center'>
+        <div style='font-size:22px;font-weight:500;color:#1b2320'>" & FORMAT(_atingido, "#,##0") & "</div>
+        <div style='font-size:10px;color:#888780;margin-top:2px;text-transform:uppercase'>Total de [MÉTRICA] atingidos</div>
+      </div>
+      <div style='background:#f8f9f8;border-radius:8px;padding:10px 12px;text-align:center'>
+        <div style='font-size:22px;font-weight:500;color:#1b2320'>" & FORMAT(_val, "0.0") & "%</div>
+        <div style='font-size:10px;color:#888780;margin-top:2px;text-transform:uppercase'>SLA Atingido</div>
+      </div>
+    </div>
+  </div>
+</div>"
+```
+
+### Instruções Críticas de Implementação
+
+**NÃO ALTERE:**
+- Estrutura do grid (`grid-template-columns:repeat(3,1fr)` no cabeçalho, `repeat(3,1fr)` no rodapé)
+- Cores e espaçamento dos elementos (border-radius, padding, gap)
+- Tamanhos de fonte da estrutura básica
+- Ordem das 3 seções (cabeçalho → grid → rodapé)
+
+**CUSTOMIZE APENAS:**
+- Nomes de medidas nos VAR (adequar ao seu indicador)
+- Valores entre `[COLCHETES]`: nome completo, finalidade, fórmula resumida
+- Faixas de glosa e suas cores (vindo do JSON de indicadores)
+- Labels dos cards do rodapé (Total de quê, Atingidos, SLA)
+
+### Exemplo Concreto Preenchido (IND02)
+
+Veja em [html-templates.md](./html-templates.md) a medida `Detalhe Indicador 2 HTML` como exemplo completo com todos os campos preenchidos.
+
+### Pós-Criação
+
+1. Antes de aplicar a medida no Power BI, passe o código DAX pelo formatador (ver Seção 5)
+2. Crie um card visual com a medida em uma página do relatório
+3. Valide que as cores, espaçamento e layout aparecem exatamente como esperado
+4. Se precisar ajustar, **modifique apenas o conteúdo entre colchetes, não o HTML/CSS**

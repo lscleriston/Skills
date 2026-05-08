@@ -54,20 +54,35 @@ RETURN
 </div>"
 ```
 
-## 2. Detalhe Individual HTML
-```dax
-Detalhe Indicador [X] HTML = 
-VAR _val = [MEDIDA_PERC]
-VAR _total = [MEDIDA_TOTAL]
-VAR _atingido = [MEDIDA_ATINGIDO]
-VAR _glosaPerc = [GLOSA_PERC]
-// ... (Badges e Cores dinâmicas)
+## 2. Detalhe Indicador X HTML (Padrão Obrigatório)
 
-VAR _glosas = "<div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'>
+### Template Genérico
+Ver [dax-templates.md - Seção 6](./dax-templates.md) para o template completo e genérico que deve ser adaptado para cada indicador.
+
+**Pontos críticos:**
+- ✅ O layout de 3 seções (cabeçalho | grid 3 colunas | rodapé) **NÃO DEVE SER ALTERADO**
+- ✅ Customize apenas: nomes de medidas, rótulos, finalidade, fórmula resumida e faixas de glosa
+- ✅ Sempre passe pelo formatador DAX antes de aplicar no Power BI
+
+### Exemplo Completo (IND02 - Modelo a Seguir)
+
+```dax
+Detalhe Indicador 2 HTML = 
+VAR _val = [IND02 - Tempo Início Atendimento %]
+VAR _total = [Total de Chamados IND02]
+VAR _iniciado = [Chamados com Início ≤30min]
+VAR _glosaPerc = DIVIDE([Glosa IND02], [Valor da ordem de serviço], 0)
+VAR _badgeBg = IF(_glosaPerc = 0, "#E1F5EE", "#FCEBEB")
+VAR _badgeText = IF(_glosaPerc = 0, "#085041", "#791F1F")
+
+VAR _glosas = 
+"<div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'>
   <div style='font-size:10px;color:#5F5E5A;text-transform:uppercase;margin-bottom:6px'>Faixas de glosa</div>
   <div style='display:flex;flex-direction:column;gap:3px'>
     <div style='display:flex;justify-content:space-between;align-items:center;font-size:11px'><span style='color:#3a4440'>≥ 90%</span><span style='background:#E1F5EE;color:#085041;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:500'>sem desconto</span></div>
-    // ... (Repetir linhas de glosa conforme o JSON)
+    <div style='display:flex;justify-content:space-between;align-items:center;font-size:11px'><span style='color:#3a4440'>≥ 75% e &lt; 90%</span><span style='background:#FAEEDA;color:#633806;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:500'>1% OS</span></div>
+    <div style='display:flex;justify-content:space-between;align-items:center;font-size:11px'><span style='color:#3a4440'>≥ 60% e &lt; 75%</span><span style='background:#FAEEDA;color:#633806;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:500'>2% OS</span></div>
+    <div style='display:flex;justify-content:space-between;align-items:center;font-size:11px'><span style='color:#3a4440'>&lt; 60%</span><span style='background:#FCEBEB;color:#791F1F;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:500'>4% OS</span></div>
   </div>
 </div>"
 
@@ -75,15 +90,37 @@ RETURN
 "<div style='font-family:Segoe UI,sans-serif;font-size:13px;line-height:1.5;max-width:100%;padding:0'>
   <div style='background:#fff;border:0.5px solid #d3d1c7;border-radius:12px;padding:16px 20px'>
     <div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px'>
-      <div><div style='font-size:10px;color:#888780;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px'>Indicador de serviço</div><div style='font-size:15px;font-weight:500;color:#1b2320'>[NOME_COMPLETO]</div></div>
+      <div>
+        <div style='font-size:10px;color:#888780;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px'>Indicador de serviço</div>
+        <div style='font-size:15px;font-weight:500;color:#1b2320'>Índice do Prazo para Início do Atendimento</div>
+      </div>
       <span style='background:" & _badgeBg & ";color:" & _badgeText & ";padding:3px 12px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap;margin-left:12px'>Glosa: " & FORMAT(_glosaPerc, "0%") & "</span>
     </div>
     <div style='display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px'>
-      <div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'><div style='font-size:10px;color:#5F5E5A;text-transform:uppercase;margin-bottom:4px'>Finalidade</div><div style='font-size:12px;color:#3a4440'>[FINALIDADE]</div></div>
-      <div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'><div style='font-size:10px;color:#5F5E5A;text-transform:uppercase;margin-bottom:4px'>Mecanismo</div><div style='font-size:11px;color:#3a4440;font-family:Consolas,monospace'>[FORMULA]</div></div>
+      <div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'>
+        <div style='font-size:10px;color:#5F5E5A;text-transform:uppercase;margin-bottom:4px'>Finalidade</div>
+        <div style='font-size:12px;color:#3a4440'>Apurar o tempo para início do atendimento (meta 30 min).</div>
+      </div>
+      <div style='border-left:3px solid #1D9E75;padding:8px 12px;background:#f0faf5;border-radius:0 6px 6px 0'>
+        <div style='font-size:10px;color:#5F5E5A;text-transform:uppercase;margin-bottom:4px'>Mecanismo de cálculo</div>
+        <div style='font-size:11px;color:#3a4440;font-family:Consolas,monospace'>(Iniciados ≤ 30min ÷ Total) × 100</div>
+      </div>
       " & _glosas & "
     </div>
-    // ... (Rodapé com 3 cards de valores)
+    <div style='border-top:0.5px solid #e4e7e5;padding-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px'>
+      <div style='background:#f8f9f8;border-radius:8px;padding:10px 12px;text-align:center'>
+        <div style='font-size:22px;font-weight:500;color:#1b2320'>" & FORMAT(_total, "#,##0") & "</div>
+        <div style='font-size:10px;color:#888780;margin-top:2px;text-transform:uppercase'>Total de chamados no período</div>
+      </div>
+      <div style='background:#f8f9f8;border-radius:8px;padding:10px 12px;text-align:center'>
+        <div style='font-size:22px;font-weight:500;color:#1b2320'>" & FORMAT(_iniciado, "#,##0") & "</div>
+        <div style='font-size:10px;color:#888780;margin-top:2px;text-transform:uppercase'>Total de chamados iniciados até 30 min</div>
+      </div>
+      <div style='background:#f8f9f8;border-radius:8px;padding:10px 12px;text-align:center'>
+        <div style='font-size:22px;font-weight:500;color:#1b2320'>" & FORMAT(_val, "0.0") & "%</div>
+        <div style='font-size:10px;color:#888780;margin-top:2px;text-transform:uppercase'>SLA Atingido</div>
+      </div>
+    </div>
   </div>
 </div>"
 ```

@@ -62,8 +62,19 @@ Antes de registrar qualquer medida DAX no Power BI via MCP:
 
 ### 5. Camada Visual (Dashboards HTML)
 - **Dashboard Consolidado:** Gere a medida `Dashboard HTML` integrando os 5 indicadores principais. Use estritamente o layout com `_kpiHtml` no topo e a grade de cards abaixo.
-- **Detalhamentos Individuais:** Gere uma medida `Detalhe Indicador X HTML` para cada indicador, focando na explicação da regra e nas faixas de glosa.
+- **Detalhamentos Individuais:** Gere uma medida `Detalhe Indicador X HTML` para cada indicador, seguindo **obrigatoriamente** o padrão em [references/dax-templates.md](references/dax-templates.md), Seção 6. **O layout não deve ser alterado em nenhuma circunstância.**
 - **Layout:** Utilize as referências em [references/html-templates.md](references/html-templates.md).
+
+#### Estrutura Obrigatória do Detalhe Indicador X HTML
+Cada medida `Detalhe Indicador X HTML` deve:
+1. Declarar VARs para armazenar: percentual, total, atingido, cores (baseadas em glosa), faixas
+2. Construir HTML com 3 seções:
+   - **Cabeçalho:** Nome do indicador + badge de glosa (dinâmico)
+   - **Grid Central:** 3 colunas = Finalidade | Mecanismo | Faixas de Glosa
+   - **Rodapé:** 3 cards = Total de [Métrica] | [Métrica] Atingida | % Atingido
+3. Usar as cores e espaçamento do template fornecido — **nunca customize o layout**
+4. Formatar valores numéricos com `FORMAT()` conforme exemplos
+5. Antes de aplicar no Power BI, passar o código DAX pelo formatador (ver Seção 5 de dax-templates.md)
 
 ## Diretrizes de Implementação
 - **Nomenclatura:** Siga o padrão `IND[XX] - [Nome] %`.
